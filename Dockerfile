@@ -2,7 +2,7 @@ FROM alpine:3.12
 
 LABEL maintainer="NGINX Docker Maintainers <docker-maint@nginx.com>"
 
-ENV NGINX_VERSION 1.19.4
+ENV NGINX_VERSION 1.21.1
 
 RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 	&& CONFIG="\
@@ -135,10 +135,13 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 	&& ln -sf /dev/stdout /var/log/nginx/access.log \
 	&& ln -sf /dev/stderr /var/log/nginx/error.log
 
-COPY nginx.conf /etc/nginx/nginx.conf
+COPY nginx.conf.template /etc/nginx/templates/nginx.conf.template
 
 EXPOSE 80
 
 STOPSIGNAL SIGTERM
+
+COPY entrypoint.sh .
+ENTRYPOINT ["./entrypoint.sh"]
 
 CMD ["nginx", "-g", "daemon off;"]

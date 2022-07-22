@@ -1,10 +1,11 @@
 FROM alpine:3.12
 
-LABEL maintainer="NGINX Docker Maintainers <docker-maint@nginx.com>"
+LABEL maintainer="Matt Campbell <mcampbell@coreweave.com>"
 
-ENV NGINX_VERSION 1.21.1
+ENV NGINX_VERSION 1.23.1
+ENV MOD_ZIP_VERSION 5b2604b3914f87db2077f2239b8a98b66cf622af
 
-RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
+RUN GPG_KEYS=573BFD6B3D8FBC641079A6ABABF5BD827BD9BF62 \
 	&& CONFIG="\
 		--prefix=/etc/nginx \
 		--sbin-path=/usr/sbin/nginx \
@@ -68,7 +69,7 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 		geoip-dev \
 	&& curl -fSL http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz -o nginx.tar.gz \
 	&& curl -fSL http://nginx.org/download/nginx-$NGINX_VERSION.tar.gz.asc  -o nginx.tar.gz.asc \
-	&& curl -fSL https://github.com/evanmiller/mod_zip/archive/1.2.0.tar.gz -o mod_zip-1.2.0.tar.gz \
+	&& curl -fSL https://github.com/evanmiller/mod_zip/archive/$MOD_ZIP_VERSION -o mod_zip-$MOD_ZIP_VERSION \
 	&& export GNUPGHOME="$(mktemp -d)" \
 	&& found=''; \
 	for server in \
@@ -85,8 +86,8 @@ RUN GPG_KEYS=B0F4253373F8F6F510D42178520A9993A1C052F8 \
 	&& rm -r "$GNUPGHOME" nginx.tar.gz.asc \
 	&& mkdir -p /usr/src \
 	&& tar -zxC /usr/src -f nginx.tar.gz \
-	&& tar -zxC /usr/src -f mod_zip-1.2.0.tar.gz \
-	&& rm nginx.tar.gz mod_zip-1.2.0.tar.gz \
+	&& tar -zxC /usr/src -f mod_zip-$MOD_ZIP_VERSION \
+	&& rm nginx.tar.gz mod_zip-$MOD_ZIP_VERSION \
 	&& cd /usr/src/nginx-$NGINX_VERSION \
 	&& ./configure $CONFIG --with-debug \
 	&& make -j$(getconf _NPROCESSORS_ONLN) \

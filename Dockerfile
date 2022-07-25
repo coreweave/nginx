@@ -45,6 +45,7 @@ FROM nginxinc/nginx-unprivileged:1.23.1
 ARG USER
 ARG nginx_module_dir="/usr/local/nginx/modules/"
 COPY --from=builder ${nginx_module_dir}/ngx_http_zip_module.so /etc/nginx/modules/
+RUN sed -i '1iload_module "modules/ngx_http_zip_module.so";' /etc/nginx/nginx.conf
 
 USER root
 

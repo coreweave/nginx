@@ -2,11 +2,11 @@ FROM debian:stable AS builder
 
 LABEL maintainer="Matt Campbell <mcampbell@coreweave.com>"
 
+ARG UID=101
 ARG MOD_ZIP_VERSION=5b2604b3914f87db2077f2239b8a98b66cf622af
 ARG NGINX_VERSION=1.23.1
 ARG build_dir="/usr/share/tmp"
 ARG nginx_module_dir="/usr/local/nginx/modules/"
-ARG USER=1001
 
 # Setup
 RUN apt-get update
@@ -42,7 +42,7 @@ RUN cd ${build_dir}/nginx-${NGINX_VERSION} \
 RUN chmod -R 644 ${nginx_module_dir}
 
 FROM nginxinc/nginx-unprivileged:1.23.1
-ARG USER
+ARG UID
 ARG nginx_module_dir="/usr/local/nginx/modules/"
 COPY --from=builder ${nginx_module_dir}/ngx_http_zip_module.so /etc/nginx/modules/
 RUN sed -i '1iload_module "modules/ngx_http_zip_module.so";' /etc/nginx/nginx.conf
@@ -51,4 +51,4 @@ USER root
 
 RUN chmod 0777 /var/cache/nginx/
 
-USER $USER
+USER $UID
